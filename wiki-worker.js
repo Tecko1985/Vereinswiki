@@ -14,6 +14,13 @@
 //
 // Secret (Settings -> Variables and Secrets -> Add):
 //   GEMINI_API_KEY = <Key aus Google AI Studio, kostenloser Tier genügt>
+//
+// WICHTIG - Service Binding (Settings -> Bindings -> Add -> Service binding):
+//   Variablenname: GATEWAY, Service: landingpage, Environment: production.
+//   Noetig, weil Cloudflare einem Worker einen direkten fetch() auf die
+//   *.workers.dev-Adresse eines ANDEREN Workers verweigert (Error 1042,
+//   Loop-Schutz) - ein Service Binding umgeht den oeffentlichen Netzwerkpfad
+//   und funktioniert deshalb trotzdem.
 
 const GATEWAY_URL = "https://landingpage.michel-brunner.workers.dev";
 const APP_ID = "vereinswiki";
@@ -41,10 +48,10 @@ function json(body, status, cors) {
   return new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
 }
 
-// Ruft das Tools-Übersicht-Gateway (admin-worker) mit dem weitergereichten
-// Nutzer-Token auf. Server-zu-Server, daher kein CORS-Thema.
-function gateway(action, payload, token) {
-  return fetch(GATEWAY_URL, {
+// Ruft das Tools-Übersicht-Gateway (admin-worker) über das Service Binding auf
+// (kein direkter fetch() auf die workers.dev-Adresse, siehe Deploy-Hinweis oben).
+function gateway(env, action, payload, token) {
+  return env.GATEWAY.fetch(GATEWAY_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
     body: JSON.stringify({ action, app: APP_ID, ...payload })
@@ -119,10 +126,13 @@ export default {
 
     try {
       // 1. Dokumentenliste laden — zugleich der Auth-/Sichtbarkeits-Check über das Gateway.
-      const listResp = await gateway("dav-load", {}, token);
+      const listResp = await gateway(env, "dav-load", {}, token);
       if (listResp.status === 401) return json({ error: "Sitzung abgelaufen." }, 401, cors);
       if (listResp.status === 403) return json({ error: "Kein Zugriff auf dieses Tool." }, 403, cors);
-      if (!listResp.ok) return json({ error: `Dokumente konnten nicht geladen werden (HTTP ${listResp.status}).` }, 502, cors);
+      if (!listResp.ok) {
+        const detail = await listResp.text().catch(() => "");
+        return json({ error: `Dokumente konnten nicht geladen werden (HTTP ${listResp.status}): ${detail.slice(0, 300)}` }, 502, cors);
+      }
 
       const listBody = await listResp.json();
       const dokumente = (listBody.data && Array.isArray(listBody.data.dokumente)) ? listBody.data.dokumente : [];
@@ -135,7 +145,7 @@ export default {
       const docs = [];
       for (const d of dokumente) {
         if (!d || !d.id) continue;
-        const fileResp = await gateway("dav-file-get", { id: d.id }, token);
+        const fileResp = await gateway(env, "dav-file-get", { id: d.id }, token);
         if (!fileResp.ok) continue; // einzelne fehlende Datei überspringen statt komplett scheitern
         const buf = await fileResp.arrayBuffer();
         total += buf.byteLength;
