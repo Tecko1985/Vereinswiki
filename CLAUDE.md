@@ -19,6 +19,8 @@ Der Wiki-Worker braucht keine eigene Token-Verifikation: Wenn `dav-load` 401/403
 
 `connect-screen` bis Login, dann `app-shell` mit drei Tabs: **Fragen** (Textarea → `askWiki` → Antwort-Karte, Strg+Enter sendet), **Dokumente** (Upload PDF/TXT + Liste mit Ansehen/Löschen, Warnbox „keine Personendaten"), **Einstellungen** (Versionshistorie). Antworttext wird escaped + `\n`→`<br>` gerendert (kein Markdown, Gemini wird auf Klartext instruiert). Gemeinsame CSS-Basis wie die anderen Tools; Vereinswiki-Klassen (`warn-card`, `upload-row`, `dok-row`, `answer-card`) am Ende von `style.css`.
 
+**Bearbeiten-Recht (seit 1.1):** Hochladen und Löschen dürfen nur Admins sowie Nutzer, deren Gruppe in der Tools-Übersicht für `vereinswiki` Bearbeiten-Rechte (`editGroupIds`) hat — Muster aus [[project-platzbelegung]]/vereinskalender/kadermanager. `fetchMe()` übergibt `app: GATEWAY_APP_ID`, wodurch der Worker `canEdit` bereits in der `me`-Antwort mitliefert (kein Worker-Redeploy nötig). `canEdit()` in `app.js` = `isAdmin || currentUser.canEdit`; gated client-seitig (`upload-card` ein-/ausblenden, Löschen-Button nur rendern, `handleUpload`/`handleDelete` brechen zusätzlich früh ab). **Nicht serverseitig in `dav-file-put`/`dav-save` erzwungen** — wie bei allen Schwester-Apps ist `userMayAccessTool` (Sichtbarkeit) die einzige Worker-seitige Schranke, `editGroupIds` nur client-seitiges UI-Gate (siehe `resolveEditPermission` in `admin-worker.js`).
+
 ## Datenschutz / Gemini-Gratis-Tier
 
 Bewusst **nur nicht-personenbezogene** Vereinsunterlagen (im Gratis-Tier nutzt Google Eingaben ggf. zum Training). Sichtbarer Warnhinweis in der Upload-UI + `config.js`-Changelog. Bei künftigem Bedarf an PII-Dokumenten: Gemini bezahlt schalten (kein Training) oder auf Claude wechseln.

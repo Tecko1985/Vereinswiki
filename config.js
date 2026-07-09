@@ -9,6 +9,12 @@ const APP_CHANGELOG = [
         items: [
           "Die App heißt jetzt „Toolbox Wiki“ – nur die Anzeige, Adresse und Daten bleiben unverändert."
         ]
+      },
+      {
+        title: "Rechte",
+        items: [
+          "Dokumente hochladen und löschen dürfen jetzt nur noch Admins bzw. Nutzer mit Bearbeiten-Recht für dieses Tool. Alle anderen können weiterhin fragen und bestehende Dokumente ansehen."
+        ]
       }
     ]
   },

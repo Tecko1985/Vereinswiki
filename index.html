@@ -76,7 +76,7 @@
         </p>
       </div>
 
-      <div class="card">
+      <div class="card" id="upload-card">
         <h3>Dokument hochladen</h3>
         <p class="muted" style="margin-bottom:12px;">PDF oder Textdatei (.txt), max. 10 MB pro Datei. Mehrere Dateien gleichzeitig möglich.</p>
         <div class="upload-row">
@@ -85,6 +85,7 @@
         </div>
         <p class="muted" id="upload-status" style="margin-top:10px; display:none;"></p>
       </div>
+      <p class="muted" id="upload-noaccess-hint" style="display:none;">Nur Admins und dafür berechtigte Nutzer können Dokumente hochladen oder löschen.</p>
 
       <div class="card">
         <h3>Hinterlegte Dokumente</h3>
@@ -117,8 +118,8 @@
   </main>
 </div>
 
-<script src="config.js?v=1.1"></script>
+<script src="config.js?v=1.2"></script>
 <script src="db.js?v=1.0"></script>
-<script src="app.js?v=1.1"></script>
+<script src="app.js?v=1.2"></script>
 </body>
 </html>

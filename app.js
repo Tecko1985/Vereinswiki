@@ -98,16 +98,25 @@ async function init() {
   showConnectScreen();
 }
 
-// Eigenes Profil (für "hinzugefügt von"). Fehler werden geschluckt — der Name
-// ist nur ein Komfort-Feature, kein Blocker für den Start.
+// Eigenes Profil (für "hinzugefügt von" + Bearbeiten-Recht). Fehler werden
+// geschluckt — der Name ist nur ein Komfort-Feature, kein Blocker für den Start;
+// ohne Profil gilt canEdit() als false (sicherer Default: kein Upload/Löschen).
 async function fetchMe() {
   try {
     const r = await gatewayRequest({ action: "me", app: GATEWAY_APP_ID });
     const displayName = (r.vorname && r.nachname) ? `${r.vorname} ${r.nachname}` : r.username;
-    return { username: r.username, displayName };
+    return { username: r.username, displayName, isAdmin: !!r.isAdmin, canEdit: !!r.canEdit };
   } catch (_) {
     return null;
   }
+}
+
+// Dokumente hochladen/löschen dürfen Admins sowie Nutzer, deren Gruppe in der
+// Tools-Übersicht für Vereinswiki Bearbeiten-Rechte hat (server-seitig über
+// den "me"-Aufruf aufgelöst) — alle anderen eingeloggten Nutzer dürfen nur
+// fragen und bestehende Dokumente ansehen.
+function canEdit() {
+  return !!(currentUser && (currentUser.isAdmin || currentUser.canEdit));
 }
 
 function showGatewayError(text) {
@@ -133,8 +142,15 @@ function startApp() {
 
 function renderAll() {
   renderVersionInfo();
+  renderUploadPermission();
   renderDokumente();
   renderFrageHint();
+}
+
+function renderUploadPermission() {
+  const editable = canEdit();
+  document.getElementById("upload-card").style.display = editable ? "block" : "none";
+  document.getElementById("upload-noaccess-hint").style.display = editable ? "none" : "block";
 }
 
 // ---------- Navigation ----------
@@ -255,6 +271,7 @@ function setUploadEnabled(on) {
 }
 
 async function handleUpload() {
+  if (!canEdit()) return;
   const input = document.getElementById("upload-input");
   const files = Array.from(input.files || []);
   if (files.length === 0) { setUploadStatus("Bitte zuerst eine Datei auswählen."); return; }
@@ -312,6 +329,7 @@ async function handleView(id) {
 }
 
 async function handleDelete(id) {
+  if (!canEdit()) return;
   const doc = appData.dokumente.find((d) => d.id === id);
   if (!doc) return;
   if (!confirm(`„${doc.name}“ wirklich aus dem Toolbox Wiki löschen?`)) return;
@@ -336,7 +354,7 @@ function renderDokumente() {
       <span class="muted">${escapeHtml(formatDateTime(d.uploadedAt))}${d.uploadedBy ? " · " + escapeHtml(d.uploadedBy) : ""}</span>
       <span class="dok-actions">
         <button class="btn secondary small" type="button" data-view-id="${escapeHtml(d.id)}">Ansehen</button>
-        <button class="btn danger small" type="button" data-delete-id="${escapeHtml(d.id)}">Löschen</button>
+        ${canEdit() ? `<button class="btn danger small" type="button" data-delete-id="${escapeHtml(d.id)}">Löschen</button>` : ""}
       </span>
     </div>
   `).join("");
