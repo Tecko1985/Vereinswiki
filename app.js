@@ -314,7 +314,7 @@ async function handleView(id) {
 async function handleDelete(id) {
   const doc = appData.dokumente.find((d) => d.id === id);
   if (!doc) return;
-  if (!confirm(`„${doc.name}“ wirklich aus dem Vereinswiki löschen?`)) return;
+  if (!confirm(`„${doc.name}“ wirklich aus dem Toolbox Wiki löschen?`)) return;
   try {
     await gatewayFileDelete(id);
     await mutateAndSave(() => { appData.dokumente = appData.dokumente.filter((d) => d.id !== id); });

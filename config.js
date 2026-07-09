@@ -1,6 +1,17 @@
-const APP_VERSION = "1.0";
+const APP_VERSION = "1.1";
 
 const APP_CHANGELOG = [
+  {
+    version: "1.1",
+    groups: [
+      {
+        title: "Oberfläche",
+        items: [
+          "Die App heißt jetzt „Toolbox Wiki“ – nur die Anzeige, Adresse und Daten bleiben unverändert."
+        ]
+      }
+    ]
+  },
   {
     version: "1.0",
     groups: [
