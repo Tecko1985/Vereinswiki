@@ -316,14 +316,31 @@ async function handleUpload() {
   renderFrageHint();
 }
 
+// Safari (v.a. iOS) blockiert window.open() nach einem await als Popup, auch wenn der
+// Aufruf aus einem Klick-Handler stammt — der "echte Nutzerklick"-Kontext gilt dort nur
+// bis zum ersten await, danach silently blockiert (kein Fehler, kein Alert). Fix: leeres
+// Fenster SYNCHRON im Klick-Callstack öffnen, danach nur noch die URL nachreichen
+// (location.href auf einer bereits offenen Fenster-Referenz ist auch später erlaubt).
+function _openBlobTab() {
+  const win = window.open("", "_blank");
+  return {
+    show(blob) {
+      const url = URL.createObjectURL(blob);
+      if (win) win.location.href = url; else window.open(url, "_blank");
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    },
+    abort() { if (win) win.close(); }
+  };
+}
+
 async function handleView(id) {
   const doc = appData.dokumente.find((d) => d.id === id);
+  const tab = _openBlobTab();
   try {
     const blob = await gatewayFileBlob(id);
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    tab.show(blob);
   } catch (e) {
+    tab.abort();
     alert(`„${doc ? doc.name : "Dokument"}“ konnte nicht geöffnet werden: ${e.message}`);
   }
 }
