@@ -2,23 +2,6 @@ const APP_VERSION = "1.0";
 
 const APP_CHANGELOG = [
   {
-    version: "1.1",
-    groups: [
-      {
-        title: "Oberfläche",
-        items: [
-          "Die App heißt jetzt „Toolbox Wiki“ – nur die Anzeige, Adresse und Daten bleiben unverändert."
-        ]
-      },
-      {
-        title: "Rechte",
-        items: [
-          "Dokumente hochladen und löschen dürfen jetzt nur noch Admins bzw. Nutzer mit Bearbeiten-Recht für dieses Tool. Alle anderen können weiterhin fragen und bestehende Dokumente ansehen."
-        ]
-      }
-    ]
-  },
-  {
     version: "1.0",
     groups: [
       {
@@ -33,7 +16,8 @@ const APP_CHANGELOG = [
         title: "Dokumente",
         items: [
           "PDF- und Text-Dokumente hochladen, ansehen und wieder löschen – sie bilden die Wissensbasis, aus der der Assistent antwortet.",
-          "Übersicht aller hinterlegten Dokumente mit Größe, Datum und Ersteller."
+          "Übersicht aller hinterlegten Dokumente mit Größe, Datum und Ersteller.",
+          "Hochladen und Löschen dürfen nur Admins bzw. Nutzer mit Bearbeiten-Recht für dieses Tool; alle anderen können weiterhin fragen und bestehende Dokumente ansehen."
         ]
       },
       {
