@@ -160,16 +160,16 @@ function setupNav() {
     btn.addEventListener("click", () => switchTab(btn.dataset.tab));
   });
   const badge = document.getElementById("version-badge");
-  badge.addEventListener("click", () => switchTab("einstellungen"));
+  badge.addEventListener("click", () => switchTab("info"));
   badge.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); switchTab("einstellungen"); }
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); switchTab("info"); }
   });
 }
 
 function switchTab(tab) {
   document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
   document.querySelectorAll(".tab-section").forEach((s) => s.classList.toggle("active", s.id === "tab-" + tab));
-  if (tab === "einstellungen") renderVersionInfo();
+  if (tab === "info") renderVersionInfo();
 }
 
 function renderVersionInfo() {

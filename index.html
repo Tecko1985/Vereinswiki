@@ -39,6 +39,7 @@
   <nav>
     <button data-tab="fragen" class="active">Fragen</button>
     <button data-tab="dokumente">Dokumente</button>
+    <button data-tab="info">Info</button>
     <button data-tab="einstellungen" style="margin-left:auto;">Einstellungen</button>
   </nav>
 
@@ -100,6 +101,22 @@
       </div>
     </section>
 
+    <!-- Info -->
+    <section class="tab-section" id="tab-info">
+      <div class="card">
+        <h2>Über das Toolbox Wiki <span class="version-badge" id="version-badge-2"></span></h2>
+        <p class="muted">
+          Stelle hier Fragen zu den Vereinsunterlagen in ganz normaler Sprache — die Antwort wird
+          auf Basis der hinterlegten Dokumente erzeugt und nennt, soweit möglich, die Quelle.
+          Steht etwas nicht in den Unterlagen, sagt der Assistent das, statt zu raten.
+        </p>
+      </div>
+      <div class="card">
+        <h2>Änderungen</h2>
+        <div id="changelog-list"></div>
+      </div>
+    </section>
+
     <!-- Einstellungen -->
     <section class="tab-section" id="tab-einstellungen">
       <div class="card">
@@ -109,10 +126,6 @@
           <a class="btn secondary small" href="https://tecko1985.github.io/ToolsUebersicht/">Zur Tools-Übersicht (an-/abmelden)</a>
         </div>
       </div>
-      <div class="card">
-        <h3>Versionshistorie <span class="version-badge" id="version-badge-2"></span></h3>
-        <div id="changelog-list"></div>
-      </div>
     </section>
 
   </main>
@@ -120,6 +133,6 @@
 
 <script src="config.js?v=1.0"></script>
 <script src="db.js?v=1.0"></script>
-<script src="app.js?v=1.0"></script>
+<script src="app.js?v=1.1"></script>
 </body>
 </html>
