@@ -103,7 +103,10 @@ async function init() {
 // ohne Profil gilt canEdit() als false (sicherer Default: kein Upload/Löschen).
 async function fetchMe() {
   try {
-    const r = await gatewayRequest({ action: "me", app: GATEWAY_APP_ID });
+    // Das dav-load davor hat die Angaben schon mitgeliefert (kostet den Worker
+    // dort keinen zusaetzlichen Nextcloud-Read) -- dann entfaellt dieser Request
+    // ganz. Nur wenn nichts vorliegt, regulaer nachfragen.
+    const r = nimmGatewayMe() || await gatewayRequest({ action: "me", app: GATEWAY_APP_ID });
     const displayName = (r.vorname && r.nachname) ? `${r.vorname} ${r.nachname}` : r.username;
     return { username: r.username, displayName, isAdmin: !!r.isAdmin, canEdit: !!r.canEdit };
   } catch (_) {

@@ -55,11 +55,27 @@ async function gatewayRequest(payload) {
   return resp.json();
 }
 
+// Das "me" aus der letzten dav-load-Antwort. Der Worker legt es bei, weil er
+// nutzer.json und die Rechte-Datei fuer diesen Request ohnehin gelesen hat --
+// der erste fetchMe() nach dem Laden kommt damit ohne eigenen Roundtrip aus.
+let gatewayMe = null;
+
 // Dokumentenliste (Metadaten) laden.
 async function gatewayLoad() {
   const body = await gatewayRequest({ action: "dav-load", app: GATEWAY_APP_ID });
   gatewayRev = typeof body.rev === "string" ? body.rev : null;
+  gatewayMe = (body.me && typeof body.me === "object") ? body.me : null;
   return body.data; // Objekt oder null (Datei noch nicht vorhanden)
+}
+
+// Nimmt das aus dav-load mitgelieferte "me" genau EINMAL entgegen; danach wieder
+// null, damit ein spaeterer Aufruf den aktuellen Stand holt statt einer alten
+// Kopie. Liefert null, wenn nichts vorliegt (aelterer Worker) -- der Aufrufer
+// fragt dann regulaer nach.
+function nimmGatewayMe() {
+  const me = gatewayMe;
+  gatewayMe = null;
+  return me;
 }
 
 // Dokumentenliste (Metadaten) speichern, mit Konfliktschutz.
