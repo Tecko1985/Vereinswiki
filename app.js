@@ -121,6 +121,10 @@ async function fetchMe() {
 function canEdit() {
   return !!(currentUser && (currentUser.isAdmin || currentUser.canEdit));
 }
+// Administrieren-Ebene: der Einstellungen-Tab (Speicherort) ist Administratoren vorbehalten (2026-07-24).
+function canAdmin() {
+  return !!(currentUser && (currentUser.isAdmin || currentUser.canAdmin));
+}
 
 function showGatewayError(text) {
   const el = document.getElementById("cloud-error");
@@ -146,8 +150,15 @@ function startApp() {
 function renderAll() {
   renderVersionInfo();
   renderUploadPermission();
+  applyAdminTabs();
   renderDokumente();
   renderFrageHint();
+}
+
+function applyAdminTabs() {
+  // Einstellungen-Tab (Speicherort) = Administrieren-Ebene (2026-07-24): nur für Admins sichtbar.
+  const el = document.querySelector('nav button[data-tab="einstellungen"]');
+  if (el) el.style.display = canAdmin() ? "" : "none";
 }
 
 function renderUploadPermission() {
